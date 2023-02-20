@@ -1,0 +1,52 @@
+version: '3'
+services:
+  s3ninja:
+    container_name: s3ninja
+    image: scireum/s3-ninja:latest
+    environment:
+      - "awsAccessKey=accessKey"
+      - "AWS_SECRET_KEY=secretKey"
+    ports:
+      - "9444:9000"
+    volumes:
+      - s3ninja:/data:/opt/s3ninja/data
+    networks:
+      - aws
+  postgres-resource:
+    container_name: postgres-resource
+    image: postgres
+    environment:
+      POSTGRES_DB: resources
+      POSTGRES_USER: pedyk
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres-resource:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "5050:80"
+    networks:
+      - postgres
+
+
+networks:
+  postgres:
+    driver: bridge
+  aws:
+    driver: bridge
+
+volumes:
+  postgres-resource:
+  s3ninja:
+  pgadmin:
