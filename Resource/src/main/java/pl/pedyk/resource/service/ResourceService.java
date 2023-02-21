@@ -11,6 +11,7 @@ import pl.pedyk.resource.repository.ResourceTrackingRepository;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +64,18 @@ public class ResourceService {
                     .mapToLong(Long::parseLong)
                     .toArray());
         }};
+    }
+
+    private boolean isMp3Audio(byte[] data) throws IOException {
+        if (data == null || data.length < 3) {
+            return false;
+        }
+        if (data[0] != (byte) 0xFF || (data[1] & 0xE0) != 0xE0) {
+            return false;
+        }
+
+        String mimeType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(data));
+        return mimeType != null && mimeType.equals("audio/mpeg");
     }
 }
 

@@ -25,6 +25,19 @@ services:
       - "5432:5432"
     networks:
       - postgres
+  postgres-song:
+    container_name: postgres-song
+    image: postgres
+    environment:
+      POSTGRES_DB: songs
+      POSTGRES_USER: pedyk
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres-song:/data/postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - postgres
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
@@ -48,5 +61,6 @@ networks:
 
 volumes:
   postgres-resource:
+  postgres-song:
   s3ninja:
   pgadmin:
