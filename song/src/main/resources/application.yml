@@ -3,10 +3,10 @@ server:
 
 spring:
   application:
-    name: Song
+    name: song
   datasource:
     username: ${DB_USERNAME:pedyk}
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/songs}
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/songs}
     password: ${DB_PASSWORD:password}
   jpa:
     properties:
