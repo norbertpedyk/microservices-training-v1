@@ -94,20 +94,6 @@ public class ResourceService {
     }
 
 
-
-
-    private boolean isMp3Audio(byte[] data) throws IOException {
-        if (data == null || data.length < 3) {
-            return false;
-        }
-        if (data[0] != (byte) 0xFF || (data[1] & 0xE0) != 0xE0) {
-            return false;
-        }
-
-        String mimeType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(data));
-        return mimeType != null && mimeType.equals("audio/mpeg");
-    }
-
     private List<Result<DeleteError>> deleteFromBucket(String ids) {
         return StreamSupport.stream(s3Client
                         .removeObjects(RemoveObjectsArgs.builder()
