@@ -1,5 +1,6 @@
 package pl.pedyk.resource.controller;
 
+import io.minio.errors.*;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,8 @@ import pl.pedyk.resource.service.ResourceService;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 @RestController
@@ -20,12 +23,12 @@ public class ResourceController {
 
 
     @PostMapping
-    public ResponseEntity<Map<String, Long>> uploadResource(@RequestBody byte[] audioData) {
+    public ResponseEntity<Map<String, Long>> uploadResource(@RequestBody byte[] audioData) throws InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, IOException, InvalidKeyException, XmlParserException, InvalidResponseException, InternalException, ServerException {
         return ResponseEntity.ok().body(resourceService.saveResource(audioData));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<byte[]> getResource(@PathVariable Long id) throws IOException {
+    public ResponseEntity<byte[]> getResource(@PathVariable Long id) throws IOException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException, InvalidResponseException, InternalException, ServerException {
         return ResponseEntity.ok().body(resourceService.getResource(id));
     }
 

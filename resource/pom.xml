@@ -38,10 +38,11 @@
         </dependency>
 
 
+
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.44</version>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>LATEST</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

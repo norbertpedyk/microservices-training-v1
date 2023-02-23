@@ -21,9 +21,9 @@ spring:
 aws:
   s3:
     bucket-name: ${AWS_BUCKET_NAME:mybucket}
-    service-endpoint: ${AWS_SERVICE_ENDPOINT:http://localhost:9444}
-    signing-region: ${AWS_SIGNING_REGION:us-east-1}
-    access-key: ${AWS_ACCESS_KEY:AKIAIOSFODNN7EXAMPLE}
-    secret-key: ${AWS_SECRET_KEY:wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY}
+    service-endpoint: ${AWS_SERVICE_ENDPOINT:http://localhost:9000}
+    access-key: ${AWS_ACCESS_KEY:minio}
+    secret-key: ${AWS_SECRET_KEY:miniopassword}
+    #    signing-region: ${AWS_SIGNING_REGION:us-east-1}
 
 
