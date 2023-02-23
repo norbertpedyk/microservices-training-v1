@@ -7,7 +7,6 @@ import io.minio.messages.DeleteObject;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.util.ArrayUtils;
 import pl.pedyk.resource.model.ResourceTracking;
 import pl.pedyk.resource.repository.ResourceTrackingRepository;
 
@@ -22,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ResourceService {
@@ -60,7 +60,7 @@ public class ResourceService {
         return s3Client.getObject(
                 GetObjectArgs.builder()
                         .bucket("mybucket")
-                        .versionId("myversionid")
+                        .object(id.toString())
                         .build()).readAllBytes();
     }
 
@@ -93,6 +93,9 @@ public class ResourceService {
         }
     }
 
+
+
+
     private boolean isMp3Audio(byte[] data) throws IOException {
         if (data == null || data.length < 3) {
             return false;
@@ -106,13 +109,15 @@ public class ResourceService {
     }
 
     private List<Result<DeleteError>> deleteFromBucket(String ids) {
-        return (List<Result<DeleteError>>) s3Client
-                .removeObjects(RemoveObjectsArgs.builder()
-                        .bucket(bucketName)
-                        .objects(Arrays.stream(ids.split(","))
-                                .map(DeleteObject::new)
-                                .collect(Collectors.toList()))
-                        .build());
+        return StreamSupport.stream(s3Client
+                        .removeObjects(RemoveObjectsArgs.builder()
+                                .bucket(bucketName)
+                                .objects(Arrays.stream(ids.split(","))
+                                        .map(DeleteObject::new)
+                                        .collect(Collectors.toList()))
+                                .build())
+                        .spliterator(), false)
+                .collect(Collectors.toList());
     }
 
     private List<String> findUnableToDelete(List<Result<DeleteError>> deletionErrors) {
