@@ -13,7 +13,6 @@ import pl.pedyk.resource.repository.ResourceTrackingRepository;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLConnection;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;

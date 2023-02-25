@@ -17,6 +17,8 @@ spring:
       ddl-auto: create
     show-sql: false
     generate-ddl: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS://localhost:29092}
 
 aws:
   s3:
@@ -24,6 +26,5 @@ aws:
     service-endpoint: ${AWS_SERVICE_ENDPOINT:http://localhost:9000}
     access-key: ${AWS_ACCESS_KEY:minio}
     secret-key: ${AWS_SECRET_KEY:miniopassword}
-    #    signing-region: ${AWS_SIGNING_REGION:us-east-1}
 
 

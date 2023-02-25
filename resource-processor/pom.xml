@@ -47,6 +47,11 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>LATEST</version>
+        </dependency>
     </dependencies>
 
     <build>
