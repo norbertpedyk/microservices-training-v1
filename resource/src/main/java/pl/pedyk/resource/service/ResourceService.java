@@ -33,6 +33,9 @@ public class ResourceService {
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
 
+    @Value("${spring.kafka.resource-topic}")
+    private String kafkaTopic;
+
     public ResourceService(MinioClient s3client, ResourceTrackingRepository resourceTrackingRepository, KafkaTemplate<String, String> kafkaTemplate) {
         this.s3Client = s3client;
         this.resourceTrackingRepository = resourceTrackingRepository;
@@ -46,7 +49,7 @@ public class ResourceService {
         Long id = resourceTracking.getId();
         try {
             ObjectWriteResponse objectWriteResponse = saveObjectToBucket(id, inputStream);
-            kafkaTemplate.send("resourceAddedTopic", objectWriteResponse.object());
+            kafkaTemplate.send(kafkaTopic, objectWriteResponse.object());
         } catch (MinioException e) {
             resourceTrackingRepository.deleteById(id);
         }

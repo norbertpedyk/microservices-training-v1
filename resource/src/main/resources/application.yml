@@ -21,6 +21,7 @@ spring:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS://localhost:29092}
     delay-ms: ${KAFKA_DELAY_MS:2000}
     max-retries: ${KAFKA_MAX_RETRIES:3}
+    resource-topic: ${KAFKA_RESOURCE_TOPIC:resourceAddedTopic}
 
 
 
