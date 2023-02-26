@@ -19,6 +19,10 @@ spring:
     generate-ddl: true
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS://localhost:29092}
+    delay-ms: ${KAFKA_DELAY_MS:2000}
+    max-retries: ${KAFKA_MAX_RETRIES:3}
+
+
 
 aws:
   s3:

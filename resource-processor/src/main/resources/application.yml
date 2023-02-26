@@ -15,6 +15,10 @@ spring:
       ddl-auto: none
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS://localhost:29092}
+  retry-template:
+    delay-ms: ${RETRY_TEMPLATE_DELAY_MS:2000}
+    max-retries: ${RETRY_TEMPLATE_MAX_RETRIES:3}
+
 
 custom:
   song-service-url: ${SONG_SERVICE_URL:http://localhost:8081/songs}

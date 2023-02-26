@@ -9,7 +9,12 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.pedyk.resourceprocessor.model.SongMetadata;
@@ -17,14 +22,17 @@ import pl.pedyk.resourceprocessor.model.SongMetadata;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Map;
 
 @Service
 public class ResourceProcessorService {
 
     private final RestTemplate restTemplate;
+    private final RetryTemplate retryTemplate;
 
-    public ResourceProcessorService(RestTemplate restTemplate) {
+    public ResourceProcessorService(RestTemplate restTemplate, RetryTemplate retryTemplate) {
         this.restTemplate = restTemplate;
+        this.retryTemplate = retryTemplate;
     }
 
     @Value("${custom.song-service-url}")
@@ -50,15 +58,26 @@ public class ResourceProcessorService {
 
 
     private void postFromTikaMetadata(Tag tag, String id, AudioFile audioFile) {
-        restTemplate.postForObject(songUrl, SongMetadata.builder()
-                        .resourceId(id)
-                        .album(tag.getFirst(FieldKey.ALBUM))
-                        .artist(tag.getFirst(FieldKey.ARTIST))
-                        .name(tag.getFirst(FieldKey.TITLE))
-                        .length(String.valueOf(audioFile.getAudioHeader().getTrackLength()))
-                        .year(tag.getFirst(FieldKey.YEAR))
-                        .build(),
-                SongMetadata.class);
+        retryTemplate.execute(context -> {
+            ResponseEntity<Map<String, Long>> response = restTemplate.exchange(
+                    songUrl,
+                    HttpMethod.POST,
+                    new HttpEntity<>(SongMetadata.builder()
+                            .resourceId(id)
+                            .album(tag.getFirst(FieldKey.ALBUM))
+                            .artist(tag.getFirst(FieldKey.ARTIST))
+                            .name(tag.getFirst(FieldKey.TITLE))
+                            .length(String.valueOf(audioFile.getAudioHeader().getTrackLength()))
+                            .year(tag.getFirst(FieldKey.YEAR))
+                            .build()),
+                    new ParameterizedTypeReference<Map<String, Long>>() {
+                    });
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return response.getBody();
+            } else {
+                throw new RuntimeException("Request failed with status code " + response.getStatusCodeValue());
+            }
+        });
     }
 
 }

@@ -17,12 +17,18 @@ public class ResourceKafkaProducerConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
+    @Value("${spring.kafka.delay-ms}")
+    private Long DELAY_MS;
+    @Value("${spring.kafka.max-retries}")
+    private Integer MAX_RETRIES;
 
     public Map<String, Object> producerConfig() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.RETRIES_CONFIG, MAX_RETRIES);
+        props.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, DELAY_MS);
         return props;
     }
 
