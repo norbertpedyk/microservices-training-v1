@@ -6,6 +6,7 @@ import io.minio.messages.DeleteError;
 import io.minio.messages.DeleteObject;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import pl.pedyk.resource.model.ResourceTracking;
 import pl.pedyk.resource.repository.ResourceTrackingRepository;
@@ -27,26 +28,28 @@ public class ResourceService {
 
     private final MinioClient s3Client;
     private final ResourceTrackingRepository resourceTrackingRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     @Value("${aws.s3.bucket-name}")
     private String bucketName;
 
-    public ResourceService(MinioClient s3client, ResourceTrackingRepository resourceTrackingRepository) {
+    public ResourceService(MinioClient s3client, ResourceTrackingRepository resourceTrackingRepository, KafkaTemplate<String, String> kafkaTemplate) {
         this.s3Client = s3client;
         this.resourceTrackingRepository = resourceTrackingRepository;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
     @Transactional
-    public Map<String, Long> saveResource(byte[] audioData) throws InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, IOException, InvalidKeyException, XmlParserException, InvalidResponseException, InternalException, ServerException {
+    public Map<String, Long> saveResource(byte[] audioData) throws NoSuchAlgorithmException, IOException, InvalidKeyException {
         ResourceTracking resourceTracking = resourceTrackingRepository.save(new ResourceTracking(bucketName));
         InputStream inputStream = new ByteArrayInputStream(audioData);
         Long id = resourceTracking.getId();
-        s3Client.putObject(PutObjectArgs.builder()
-                .bucket(bucketName)
-                .object(id.toString())
-                .stream(inputStream, inputStream.available(), -1)
-                .contentType("application/octet-stream")
-                .build());
+        try {
+            ObjectWriteResponse objectWriteResponse = saveObjectToBucket(id, inputStream);
+            kafkaTemplate.send("resourceAddedTopic", objectWriteResponse.object());
+        } catch (MinioException e) {
+            resourceTrackingRepository.deleteById(id);
+        }
         return new HashMap<>() {
             {
                 put("id", id);
@@ -58,7 +61,7 @@ public class ResourceService {
     public byte[] getResource(Long id) throws IOException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, XmlParserException, InvalidResponseException, InternalException, ServerException {
         return s3Client.getObject(
                 GetObjectArgs.builder()
-                        .bucket("mybucket")
+                        .bucket(bucketName)
                         .object(id.toString())
                         .build()).readAllBytes();
     }
@@ -122,6 +125,15 @@ public class ResourceService {
         return Arrays.stream(ids.split(",")).toList().stream()
                 .filter(id -> !unableToDelete.contains(id))
                 .map(Long::parseLong).toList();
+    }
+
+    private ObjectWriteResponse saveObjectToBucket(Long id, InputStream inputStream) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        return s3Client.putObject(PutObjectArgs.builder()
+                .bucket(bucketName)
+                .object(id.toString())
+                .stream(inputStream, inputStream.available(), -1)
+                .contentType("application/octet-stream")
+                .build());
     }
 }
 

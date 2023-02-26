@@ -17,6 +17,7 @@ spring:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS://localhost:29092}
 
 custom:
-  song-service-url: ${SONG_SERVICE_URL:http://localhost:8081/songs/}
+  song-service-url: ${SONG_SERVICE_URL:http://localhost:8081/songs}
+  resource-service-url: ${RESOURCE_SERVICE_URL:http://localhost:8080/resources/}
 
 

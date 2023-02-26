@@ -9,9 +9,9 @@ import org.springframework.kafka.config.TopicBuilder;
 public class ResourceKafkaTopicConfig {
 
     @Bean
-    public NewTopic postTopic() {
+    public NewTopic resourceAddedTopic() {
         return TopicBuilder
-                .name("postTopic")
+                .name("resourceAddedTopic")
                 .build();
     }
 }

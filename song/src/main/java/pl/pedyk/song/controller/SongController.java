@@ -15,7 +15,7 @@ public class SongController {
 
     private final SongService songService;
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<Map<String, Long>> createSong(@RequestBody Song requestSong) {
         return ResponseEntity
                 .ok()

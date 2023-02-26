@@ -38,7 +38,6 @@
         </dependency>
 
 
-
         <dependency>
             <groupId>io.minio</groupId>
             <artifactId>minio</artifactId>
@@ -54,6 +53,7 @@
             <artifactId>spring-kafka</artifactId>
             <version>LATEST</version>
         </dependency>
+
     </dependencies>
 
     <build>

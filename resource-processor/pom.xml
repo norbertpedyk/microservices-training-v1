@@ -52,6 +52,13 @@
             <artifactId>spring-kafka</artifactId>
             <version>LATEST</version>
         </dependency>
+        <dependency>
+            <groupId>org.jaudiotagger</groupId>
+            <artifactId>jaudiotagger</artifactId>
+            <version>LATEST</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
